@@ -1,31 +1,11 @@
 import { Block, KnownBlock } from '@slack/bolt';
 import moment from 'moment';
 import { BDAY_EDIT, BDAY_MODAL_OPEN } from './actions';
-import { getRandomItem } from './helpers';
-import { birthdayMessagePresets } from './messages';
+import { generateBirthdayStatus, getRandomBirthdayMessage } from './messages';
 
 interface Blocks {
   blocks: (KnownBlock | Block)[];
 }
-
-const generateBirthdayText = (userName?: string, birthday?: moment.Moment) => {
-  if (!birthday) return 'You currently have no birthday registered.';
-  const daysAway = birthday.diff(moment().utc().startOf('day'), 'days');
-  switch (daysAway) {
-    case 0:
-      return `:tada: ${
-        userName || 'Cowabunga'
-      }, it's your birthday *today*! Cake :birthday: and ice cream :ice_cream: is on it's way! :enoch-fish:`;
-    case 1:
-      return `Your birthday is currently set to *${birthday.format(
-        'MMMM Do'
-      )}* - that's *tomorrow*! :ahh:`;
-    default:
-      return `Your birthday is currently set to *${birthday.format(
-        'MMMM Do'
-      )}* - that's ${daysAway} days away!`;
-  }
-};
 
 export const generateHomeBlocks = (
   userName?: string,
@@ -73,7 +53,7 @@ export const generateHomeBlocks = (
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: generateBirthdayText(userName, birthday),
+          text: generateBirthdayStatus(userName, birthday),
         },
       },
       {
@@ -185,7 +165,7 @@ export const birthdayInputBlocks = (initialDate?: string): Blocks => ({
 });
 
 export const generateBirthdayMessage = (slackUser: string): Blocks => {
-  const { messageText, imageURL } = getRandomItem(birthdayMessagePresets);
+  const { messageText, imageURL } = getRandomBirthdayMessage();
   return {
     blocks: [
       {
