@@ -13,7 +13,7 @@ a simple self-hosted alternative that doesn't cost as much.
 
 Currently supports:
 
-- Collecting birthday information (through a Slack modal)
+- Collecting birthday information through a Slack modal
 - Sending birthday messages to a configurable channel
 - Sending welcome message to new Slack users
 
@@ -21,6 +21,30 @@ Roadmap:
 
 - Sending birthday reminders to others (ex: 1 week before)
 - Supporting multiple teams and birthday message channels
+
+## Setup
+
+### Install
+
+```bash
+# Install dependencies
+yarn install
+```
+
+### Development
+
+```bash
+# Run locally
+yarn dev
+
+# Build and run for production
+yarn start
+
+# Lint/format/typecheck
+yarn lint:check
+yarn format:check
+yarn typecheck
+```
 
 ## Contributors
 
