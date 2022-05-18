@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { getRandomItem } from './helpers';
+import { getRandomItem } from '../util';
 
 interface BirthdayMessage {
   messageText: string;

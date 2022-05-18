@@ -1,8 +1,9 @@
 import './util/env';
 import moment from 'moment';
-import { generateBirthdayMessage } from './util/blocks';
 import { prisma } from './util/db';
 import { WebClient } from '@slack/web-api';
+import { generateBirthdayMessage } from './blocks';
+import { getScheduledPosts } from './util';
 
 // Right now we schedule in UTC, does not account for daylight savings
 const CELEBRATION_HOUR = 14; // 14 = 2pm UTC = 10am EDT = 9am EST
@@ -33,12 +34,7 @@ const schedulePosts = async () => {
         },
       },
     });
-    const scheduled = await client.chat.scheduledMessages.list({
-      channel: TARGET_CHANNEL_ID,
-      oldest: moment.utc().startOf('day').unix(),
-      latest: moment.utc().endOf('day').unix(),
-    });
-    console.log(scheduled);
+    const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID)
     await Promise.all(
       users.map(async ({ slackUser }) => {
         const alreadyScheduled = scheduled.scheduled_messages?.some((msg) =>

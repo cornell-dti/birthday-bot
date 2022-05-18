@@ -12,14 +12,17 @@ import {
   generateHomeBlocks,
   welcomeInitBlocks,
   welcomeResBlocks,
-} from './util/blocks';
+} from './blocks';
 import {
   BDAY_EDIT,
   BDAY_MODAL,
   ModalMetadata,
   BDAY_MODAL_OPEN,
-} from './util/actions';
+} from './blocks/actions';
 import { prisma } from './util/db';
+import { getScheduledPosts } from './util';
+
+const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -151,9 +154,16 @@ app.view<ViewSubmitAction>(
       });
       logger.info(result);
 
-      // TODO: If a birthday celebration message is scheduled but then user's
-      // TODO: birthday is changed from today, we should try to unschedule the
-      // TODO: message
+      const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID);
+      scheduled.scheduled_messages
+        ?.filter((msg) => msg.text?.includes(`<@${slackUser}>`))
+        ?.forEach((msg) => {
+          if (!msg.channel_id || !msg.id) return;
+          client.chat.deleteScheduledMessage({
+            channel: msg.channel_id,
+            scheduled_message_id: msg.id,
+          });
+        });
 
       if (birthday) {
         const metadata: ModalMetadata | undefined = JSON.parse(
