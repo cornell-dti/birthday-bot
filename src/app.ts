@@ -25,6 +25,8 @@ import { PrismaClient } from '@prisma/client';
 import moment from 'moment';
 import cron from 'node-cron';
 
+// Right now we schedule in UTC, does not account for daylight savings
+const CELEBRATION_HOUR = 14; // 14 = 2pm UTC = 10am EDT = 9am EST
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
 
 const prisma = new PrismaClient();
@@ -189,7 +191,14 @@ app.view<ViewSubmitAction>(
 
 const schedulePosts = async () => {
   try {
-    const postTime = moment().utc().hour(14).minute(0).second(0).unix();
+    const postAt = moment()
+      .utc()
+      .set({
+        hour: CELEBRATION_HOUR,
+        minute: 0,
+        second: 0,
+      })
+      .unix();
     const today = moment().utc().year(0).toDate();
     const users = await prisma.birthday.findMany({
       select: {
@@ -205,7 +214,7 @@ const schedulePosts = async () => {
       users.map(async ({ slackUser }) => {
         await app.client.chat.scheduleMessage({
           channel: TARGET_CHANNEL_ID,
-          post_at: postTime,
+          post_at: postAt,
           text: `Happy Birthday <@${slackUser}>!`,
           ...generateBirthdayMessage(slackUser),
         });
@@ -219,7 +228,7 @@ const schedulePosts = async () => {
 (async () => {
   await app.start();
   schedulePosts();
-  cron.schedule('0 9 * * *', schedulePosts, { timezone: 'UTC' });
+  cron.schedule('0 0 * * *', schedulePosts, { timezone: 'UTC' });
 
   console.log(`⚡️ Bolt app is running}!`);
 })();
