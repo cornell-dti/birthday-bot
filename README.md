@@ -23,6 +23,7 @@ Roadmap:
 - Supporting multiple teams and birthday message channels
 - Calendar integration
 - Ability to opt out of celebrations
+- Filterable upcoming birthday list/table view
 
 ## Setup
 
