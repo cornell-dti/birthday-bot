@@ -1,0 +1,212 @@
+import { Block, KnownBlock } from '@slack/bolt';
+import moment from 'moment';
+import { BDAY_EDIT, BDAY_MODAL_OPEN } from './actions';
+import { getRandomItem } from './helpers';
+import { birthdayMessagePresets } from './messages';
+
+interface Blocks {
+  blocks: (KnownBlock | Block)[];
+}
+
+const generateBirthdayText = (userName?: string, birthday?: moment.Moment) => {
+  if (!birthday) return 'You currently have no birthday registered.';
+  const daysAway = birthday.diff(moment().utc().startOf('day'), 'days');
+  switch (daysAway) {
+    case 0:
+      return `:tada: ${
+        userName || 'Cowabunga'
+      }, it's your birthday *today*! Cake :birthday: and ice cream :ice_cream: is on it's way! :enoch-fish:`;
+    case 1:
+      return `Your birthday is currently set to *${birthday.format(
+        'MMMM Do'
+      )}* - that's *tomorrow*! :ahh:`;
+    default:
+      return `Your birthday is currently set to *${birthday.format(
+        'MMMM Do'
+      )}* - that's ${daysAway} days away!`;
+  }
+};
+
+export const generateHomeBlocks = (
+  userName?: string,
+  birthdayRaw?: Date
+): Blocks => {
+  const birthday =
+    birthdayRaw &&
+    moment()
+      .utc()
+      .month(birthdayRaw.getUTCMonth())
+      .date(birthdayRaw.getUTCDate());
+  if (birthday?.isBefore(moment().utc().startOf('day'), 'day')) {
+    birthday?.add(1, 'year');
+  }
+  return {
+    blocks: [
+      {
+        type: 'header',
+        text: {
+          type: 'plain_text',
+          text: ':bust_in_silhouette: Your Summary',
+          emoji: true,
+        },
+      },
+      {
+        type: 'divider',
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text: 'Welcome to DTI Birthday Bot!',
+          emoji: true,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'plain_text',
+          text: 'Set your birthday so we can celebrate it together!',
+          emoji: true,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: generateBirthdayText(userName, birthday),
+        },
+      },
+      {
+        type: 'actions',
+        elements: [
+          {
+            type: 'button',
+            style: birthday ? undefined : 'primary',
+            text: {
+              type: 'plain_text',
+              text: birthday ? 'Edit Birthday' : `Set Birthday`,
+              emoji: true,
+            },
+            value: birthday?.format('YYYY-MM-DD'),
+            action_id: BDAY_MODAL_OPEN,
+          },
+        ],
+      },
+    ],
+  };
+};
+
+export const welcomeInitBlocks = (slackUser: string): Blocks => ({
+  blocks: [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Hey <@${slackUser}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'When the special day arrives, I share a fun birthday wish for each member of the team. :tada:',
+      },
+    },
+    {
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: {
+            type: 'plain_text',
+            text: ':cake: Add Birthday',
+            emoji: true,
+          },
+          action_id: BDAY_MODAL_OPEN,
+        },
+      ],
+    },
+  ],
+});
+
+export const welcomeResBlocks = (slackUser: string): Blocks => ({
+  blocks: [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Hey <@${slackUser}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: 'When the special day arrives, I share a fun birthday wish for each member of the team. :tada:',
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `Thanks adding your birthday! You can head to my Home tab for more details.`,
+      },
+    },
+  ],
+});
+
+export const birthdayInputBlocks = (initialDate?: string): Blocks => ({
+  blocks: [
+    {
+      type: 'input',
+      element: {
+        type: 'datepicker',
+        initial_date: initialDate,
+        placeholder: {
+          type: 'plain_text',
+          text: 'Select a date',
+          emoji: true,
+        },
+        action_id: BDAY_EDIT,
+      },
+      optional: true,
+      label: {
+        type: 'plain_text',
+        text: 'Birthday',
+        emoji: true,
+      },
+      hint: {
+        type: 'plain_text',
+        text: '(i will ignore the year)',
+        emoji: true,
+      },
+    },
+  ],
+});
+
+export const generateBirthdayMessage = (slackUser: string): Blocks => {
+  const { messageText, imageURL } = getRandomItem(birthdayMessagePresets);
+  return {
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Hey <@${slackUser}>,`,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: messageText,
+        },
+      },
+      {
+        type: 'image',
+        image_url: imageURL,
+        alt_text: 'birthday celebration',
+      },
+    ],
+  };
+};

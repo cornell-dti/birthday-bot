@@ -1,0 +1,14 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model Birthday {
+  id        Int      @id @default(sequence())
+  slackUser String   @unique
+  birthday  DateTime @db.Date
+}
