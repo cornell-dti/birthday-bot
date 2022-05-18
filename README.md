@@ -21,6 +21,8 @@ Roadmap:
 
 - Sending birthday reminders to others (ex: 1 week before)
 - Supporting multiple teams and birthday message channels
+- Calendar integration
+- Ability to opt out of celebrations
 
 ## Setup
 
