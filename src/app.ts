@@ -151,7 +151,10 @@ app.view<ViewSubmitAction>(
         user_id: slackUser,
         view: {
           type: 'home',
-          ...generateHomeBlocks(userInfo?.user?.profile?.display_name, birthday),
+          ...generateHomeBlocks(
+            userInfo?.user?.profile?.display_name,
+            birthday
+          ),
         },
       });
       logger.info(result);

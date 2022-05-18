@@ -5,7 +5,7 @@ export const BDAY_EDIT = 'birthday-edit';
 export const BDAY_SAVE = 'birthday-save';
 
 export interface ModalMetadata {
-  ts?: string
-  channel?: string
-  response_url?: string
+  ts?: string;
+  channel?: string;
+  response_url?: string;
 }
