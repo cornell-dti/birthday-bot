@@ -25,7 +25,7 @@ import { PrismaClient } from '@prisma/client';
 import moment from 'moment';
 import cron from 'node-cron';
 
-const MAIN_CHANNEL = 'C03FJ2V7LCT';
+const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
 
 const prisma = new PrismaClient();
 
@@ -204,7 +204,7 @@ const schedulePosts = async () => {
     await Promise.all(
       users.map(async ({ slackUser }) => {
         await app.client.chat.scheduleMessage({
-          channel: MAIN_CHANNEL,
+          channel: TARGET_CHANNEL_ID,
           post_at: postTime,
           text: `Happy Birthday <@${slackUser}>!`,
           ...generateBirthdayMessage(slackUser),
