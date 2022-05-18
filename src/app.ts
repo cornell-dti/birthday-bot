@@ -161,6 +161,10 @@ app.view<ViewSubmitAction>(
       });
       logger.info(result);
 
+      // TODO: If a birthday celebration message is scheduled but then user's
+      // TODO: birthday is changed from today, we should try to unschedule the
+      // TODO: message
+
       if (birthday) {
         const metadata: ModalMetadata | undefined = JSON.parse(
           body.view.private_metadata
@@ -199,14 +203,15 @@ const schedulePosts = async () => {
         second: 0,
       })
       .unix();
-    const today = moment().utc().year(0).toDate();
+    // Birthday representations in DB are stored with year 0
+    const dbToday = moment().utc().year(0).toDate();
     const users = await prisma.birthday.findMany({
       select: {
         slackUser: true,
       },
       where: {
         birthday: {
-          equals: today,
+          equals: dbToday,
         },
       },
     });
