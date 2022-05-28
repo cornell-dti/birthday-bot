@@ -34,7 +34,7 @@ const schedulePosts = async () => {
         },
       },
     });
-    const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID)
+    const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID);
     await Promise.all(
       users.map(async ({ slackUser }) => {
         const alreadyScheduled = scheduled.scheduled_messages?.some((msg) =>
