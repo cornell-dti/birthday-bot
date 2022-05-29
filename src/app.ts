@@ -1,4 +1,4 @@
-import './util/env';
+import "./util/env";
 import {
   App,
   BlockAction,
@@ -6,21 +6,21 @@ import {
   InputBlock,
   LogLevel,
   ViewSubmitAction,
-} from '@slack/bolt';
+} from "@slack/bolt";
 import {
   birthdayInputBlocks,
   generateHomeBlocks,
   welcomeInitBlocks,
   welcomeResBlocks,
-} from './blocks';
+} from "./blocks";
 import {
   BDAY_EDIT,
   BDAY_MODAL,
   ModalMetadata,
   BDAY_MODAL_OPEN,
-} from './blocks/actions';
-import { prisma } from './util/db';
-import { getScheduledPosts } from './util';
+} from "./blocks/actions";
+import { prisma } from "./util/db";
+import { getScheduledPosts } from "./util";
 
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
 
@@ -36,7 +36,7 @@ app.use(async ({ next }) => {
   await next!();
 });
 
-app.event('app_home_opened', async ({ event, client, logger }) => {
+app.event("app_home_opened", async ({ event, client, logger }) => {
   const userInfo = await client.users.info({
     user: event.user,
   });
@@ -54,7 +54,7 @@ app.event('app_home_opened', async ({ event, client, logger }) => {
   await client.views.publish({
     user_id: event.user,
     view: {
-      type: 'home',
+      type: "home",
       blocks: generateHomeBlocks(
         userInfo?.user?.profile?.display_name,
         result?.birthday
@@ -63,7 +63,7 @@ app.event('app_home_opened', async ({ event, client, logger }) => {
   });
 });
 
-app.event('team_join', async ({ event, client, logger }) => {
+app.event("team_join", async ({ event, client, logger }) => {
   try {
     const result = await client.chat.postMessage({
       channel: event.user.id,
@@ -89,19 +89,19 @@ app.action<BlockAction<ButtonAction>>(
         trigger_id: body.trigger_id,
         view: {
           private_metadata: JSON.stringify(metadata),
-          type: 'modal',
+          type: "modal",
           callback_id: BDAY_MODAL,
           title: {
-            type: 'plain_text',
-            text: 'Add your birthday!',
+            type: "plain_text",
+            text: "Add your birthday!",
           },
           submit: {
-            type: 'plain_text',
-            text: 'Save',
+            type: "plain_text",
+            text: "Save",
           },
           close: {
-            type: 'plain_text',
-            text: 'Cancel',
+            type: "plain_text",
+            text: "Cancel",
           },
           blocks: birthdayInputBlocks(action.value),
         },
@@ -146,7 +146,7 @@ app.view<ViewSubmitAction>(
       const result = await client.views.publish({
         user_id: slackUser,
         view: {
-          type: 'home',
+          type: "home",
           blocks: generateHomeBlocks(
             userInfo?.user?.profile?.display_name,
             birthday

@@ -1,9 +1,9 @@
-import './util/env';
-import moment from 'moment';
-import { prisma } from './util/db';
-import { WebClient } from '@slack/web-api';
-import { generateBirthdayMessage } from './blocks';
-import { getScheduledPosts } from './util';
+import "./util/env";
+import moment from "moment";
+import { prisma } from "./util/db";
+import { WebClient } from "@slack/web-api";
+import { generateBirthdayMessage } from "./blocks";
+import { getScheduledPosts } from "./util";
 
 // Right now we schedule in UTC, does not account for daylight savings
 const CELEBRATION_HOUR = 14; // 14 = 2pm UTC = 10am EDT = 9am EST
