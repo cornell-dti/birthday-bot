@@ -1,11 +1,11 @@
-import { Block, KnownBlock } from '@slack/bolt';
-import moment from 'moment';
-import { generateBirthdayStatus, getRandomMessage } from '../util/messages';
-import { BDAY_EDIT, BDAY_MODAL_OPEN } from './actions';
+import { Block, KnownBlock } from "@slack/bolt";
+import moment from "moment";
+import { generateBirthdayStatus, getRandomMessage } from "../util/messages";
+import { BDAY_EDIT, BDAY_MODAL_OPEN } from "./actions";
 
 type Blocks = (KnownBlock | Block)[];
 
-export const generateHomeBlocks = (
+export const getHomeBlocks = (
   userName?: string,
   birthdayRaw?: Date
 ): Blocks => {
@@ -15,56 +15,48 @@ export const generateHomeBlocks = (
       .utc()
       .month(birthdayRaw.getUTCMonth())
       .date(birthdayRaw.getUTCDate());
-  if (birthday?.isBefore(moment().utc().startOf('day'), 'day')) {
-    birthday?.add(1, 'year');
+  if (birthday?.isBefore(moment().utc().startOf("day"), "day")) {
+    birthday?.add(1, "year");
   }
   return [
     {
-      type: 'header',
+      type: "header",
       text: {
-        type: 'plain_text',
-        text: ':bust_in_silhouette: Your Summary',
+        type: "plain_text",
+        text: ":bust_in_silhouette: Your Summary",
         emoji: true,
       },
     },
     {
-      type: 'divider',
+      type: "divider",
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'plain_text',
-        text: 'Welcome to DTI Birthday Bot!',
+        type: "plain_text",
+        text: "Set your birthday so we can celebrate it together!",
         emoji: true,
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'plain_text',
-        text: 'Set your birthday so we can celebrate it together!',
-        emoji: true,
-      },
-    },
-    {
-      type: 'section',
-      text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: generateBirthdayStatus(userName, birthday),
       },
     },
     {
-      type: 'actions',
+      type: "actions",
       elements: [
         {
-          type: 'button',
-          style: birthday ? undefined : 'primary',
+          type: "button",
+          style: birthday ? undefined : "primary",
           text: {
-            type: 'plain_text',
-            text: birthday ? 'Edit Birthday' : `Set Birthday`,
+            type: "plain_text",
+            text: birthday ? "Edit Birthday" : `Set Birthday`,
             emoji: true,
           },
-          value: birthday?.format('YYYY-MM-DD'),
+          value: birthday?.format("YYYY-MM-DD"),
           action_id: BDAY_MODAL_OPEN,
         },
       ],
@@ -72,29 +64,32 @@ export const generateHomeBlocks = (
   ];
 };
 
-export const welcomeInitBlocks = (slackUser: string): Blocks => [
+export const getWelcomeMessageBlocks = (slackUser: string): Blocks => [
   {
-    type: 'section',
+    type: "section",
     text: {
-      type: 'mrkdwn',
+      type: "mrkdwn",
       text: `Hey <@${slackUser}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
     },
   },
   {
-    type: 'section',
+    type: "section",
     text: {
-      type: 'mrkdwn',
-      text: 'When the special day arrives, I share a fun birthday wish for each member of the team. :tada:',
+      type: "mrkdwn",
+      text: "When the special day arrives, I share a fun birthday wish for each member of the team. :tada:",
     },
   },
+];
+
+export const getWelcomePromptBlocks = (): Blocks => [
   {
-    type: 'actions',
+    type: "actions",
     elements: [
       {
-        type: 'button',
+        type: "button",
         text: {
-          type: 'plain_text',
-          text: ':cake: Add Birthday',
+          type: "plain_text",
+          text: ":cake: Add Birthday",
           emoji: true,
         },
         action_id: BDAY_MODAL_OPEN,
@@ -103,80 +98,66 @@ export const welcomeInitBlocks = (slackUser: string): Blocks => [
   },
 ];
 
-export const welcomeResBlocks = (slackUser: string): Blocks => [
+export const getWelcomeResponseBlocks = (): Blocks => [
   {
-    type: 'section',
+    type: "section",
     text: {
-      type: 'mrkdwn',
-      text: `Hey <@${slackUser}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
-    },
-  },
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
-      text: 'When the special day arrives, I share a fun birthday wish for each member of the team. :tada:',
-    },
-  },
-  {
-    type: 'section',
-    text: {
-      type: 'mrkdwn',
+      type: "mrkdwn",
       text: `Thanks adding your birthday! You can head to my Home tab for more details.`,
     },
   },
 ];
 
-export const birthdayInputBlocks = (initialDate?: string): Blocks => [
+export const getBirthdayInputBlocks = (initialDate?: string): Blocks => [
   {
-    type: 'input',
+    type: "input",
     element: {
-      type: 'datepicker',
+      type: "datepicker",
       initial_date: initialDate,
       placeholder: {
-        type: 'plain_text',
-        text: 'Select a date',
+        type: "plain_text",
+        text: "Select a date",
         emoji: true,
       },
       action_id: BDAY_EDIT,
     },
     optional: true,
     label: {
-      type: 'plain_text',
-      text: 'Birthday',
+      type: "plain_text",
+      text: "Birthday",
       emoji: true,
     },
     hint: {
-      type: 'plain_text',
-      text: '(i will ignore the year)',
+      type: "plain_text",
+      text: "(i will ignore the year)",
       emoji: true,
     },
   },
 ];
 
-export const generateBirthdayMessage = async (
+export const getBirthdayMessageBlocks = async (
   slackUser: string
 ): Promise<Blocks> => {
   const { messageText, imageURL } = await getRandomMessage();
   return [
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: `Hey <@${slackUser}>,`,
       },
     },
     {
-      type: 'section',
+      type: "section",
       text: {
-        type: 'mrkdwn',
+        type: "mrkdwn",
         text: messageText,
       },
     },
     {
-      type: 'image',
+      type: "image",
       image_url: imageURL,
-      alt_text: 'birthday celebration',
+      alt_text: "birthday celebration",
     },
   ];
 };
