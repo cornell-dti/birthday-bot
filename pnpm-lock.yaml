@@ -6,6 +6,7 @@ specifiers:
   '@slack/web-api': ^6.7.1
   '@swc/cli': ^0.1.57
   '@swc/core': ^1.2.183
+  '@types/giphy-api': ^2.0.3
   '@types/node': ^17.0.33
   '@types/node-cron': ^3.0.1
   '@typescript-eslint/eslint-plugin': ^5.23.0
@@ -17,6 +18,7 @@ specifiers:
   eslint-plugin-import: ^2.25.2
   eslint-plugin-n: ^15.0.0
   eslint-plugin-promise: ^6.0.0
+  giphy-api: ^2.0.2
   moment: ^2.29.3
   prettier: ^2.6.2
   prisma: ^3.14.0
@@ -28,11 +30,13 @@ dependencies:
   '@slack/bolt': 3.11.1
   '@slack/web-api': 6.7.1
   dotenv: 16.0.1
+  giphy-api: 2.0.2
   moment: 2.29.3
 
 devDependencies:
   '@swc/cli': 0.1.57_@swc+core@1.2.194
   '@swc/core': 1.2.194
+  '@types/giphy-api': 2.0.3
   '@types/node': 17.0.36
   '@types/node-cron': 3.0.1
   '@typescript-eslint/eslint-plugin': 5.26.0_hzuh7e2up357pvq3mkokjvu2lq
@@ -439,6 +443,10 @@ packages:
       '@types/qs': 6.9.7
       '@types/serve-static': 1.13.10
     dev: false
+
+  /@types/giphy-api/2.0.3:
+    resolution: {integrity: sha512-nqwYMwWwa6uwnj4RbiexCj9yPTQS8etUD5LyA4T7GwqyX5WDowJ+8c5J5N4QHJOvHXF1wzt/fQ0UIAkDJtg+ig==}
+    dev: true
 
   /@types/is-stream/1.1.0:
     resolution: {integrity: sha512-jkZatu4QVbR60mpIzjINmtS1ZF4a/FqdTUTBeQDVOQ2PYyidtwFKr0B5G6ERukKwliq+7mIXvxyppwzG5EgRYg==}
@@ -1503,6 +1511,10 @@ packages:
     dependencies:
       call-bind: 1.0.2
       get-intrinsic: 1.1.1
+
+  /giphy-api/2.0.2:
+    resolution: {integrity: sha512-vZaLQhgMF0mDQSNpqooe4Zqoe2dWGqVYhh7Ar6I41BRtcZtfupr9avT23IIPScKBYfb3qAfiKQRQyKgLi8Lcxw==}
+    dev: false
 
   /glob-parent/5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}

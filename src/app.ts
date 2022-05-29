@@ -55,7 +55,7 @@ app.event('app_home_opened', async ({ event, client, logger }) => {
     user_id: event.user,
     view: {
       type: 'home',
-      ...generateHomeBlocks(
+      blocks: generateHomeBlocks(
         userInfo?.user?.profile?.display_name,
         result?.birthday
       ),
@@ -67,7 +67,7 @@ app.event('team_join', async ({ event, client, logger }) => {
   try {
     const result = await client.chat.postMessage({
       channel: event.user.id,
-      ...welcomeInitBlocks(event.user.id),
+      blocks: welcomeInitBlocks(event.user.id),
     });
     logger.info(result);
   } catch (error) {
@@ -103,7 +103,7 @@ app.action<BlockAction<ButtonAction>>(
             type: 'plain_text',
             text: 'Cancel',
           },
-          ...birthdayInputBlocks(action.value),
+          blocks: birthdayInputBlocks(action.value),
         },
       });
       logger.info(result);
@@ -142,11 +142,12 @@ app.view<ViewSubmitAction>(
       if (userInfo.error) {
         logger.error(userInfo.error);
       }
+
       const result = await client.views.publish({
         user_id: slackUser,
         view: {
           type: 'home',
-          ...generateHomeBlocks(
+          blocks: generateHomeBlocks(
             userInfo?.user?.profile?.display_name,
             birthday
           ),
@@ -173,10 +174,9 @@ app.view<ViewSubmitAction>(
           client.chat.update({
             ts: metadata.ts,
             channel: metadata.channel,
-            ...welcomeResBlocks(slackUser),
+            blocks: welcomeResBlocks(slackUser),
           });
         }
-
         await prisma.birthday.upsert({
           create: { slackUser, birthday },
           update: { birthday },
