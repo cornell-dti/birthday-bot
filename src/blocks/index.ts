@@ -5,7 +5,7 @@ import { BDAY_EDIT, BDAY_MODAL_OPEN } from "./actions";
 
 type Blocks = (KnownBlock | Block)[];
 
-export const generateHomeBlocks = (
+export const getHomeBlocks = (
   userName?: string,
   birthdayRaw?: Date
 ): Blocks => {
@@ -29,14 +29,6 @@ export const generateHomeBlocks = (
     },
     {
       type: "divider",
-    },
-    {
-      type: "section",
-      text: {
-        type: "plain_text",
-        text: "Welcome to DTI Birthday Bot!",
-        emoji: true,
-      },
     },
     {
       type: "section",
@@ -72,7 +64,7 @@ export const generateHomeBlocks = (
   ];
 };
 
-export const welcomeInitBlocks = (slackUser: string): Blocks => [
+export const getWelcomeMessageBlocks = (slackUser: string): Blocks => [
   {
     type: "section",
     text: {
@@ -87,6 +79,9 @@ export const welcomeInitBlocks = (slackUser: string): Blocks => [
       text: "When the special day arrives, I share a fun birthday wish for each member of the team. :tada:",
     },
   },
+];
+
+export const getWelcomePromptBlocks = (): Blocks => [
   {
     type: "actions",
     elements: [
@@ -103,21 +98,7 @@ export const welcomeInitBlocks = (slackUser: string): Blocks => [
   },
 ];
 
-export const welcomeResBlocks = (slackUser: string): Blocks => [
-  {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `Hey <@${slackUser}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
-    },
-  },
-  {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: "When the special day arrives, I share a fun birthday wish for each member of the team. :tada:",
-    },
-  },
+export const getWelcomeResponseBlocks = (): Blocks => [
   {
     type: "section",
     text: {
@@ -127,7 +108,7 @@ export const welcomeResBlocks = (slackUser: string): Blocks => [
   },
 ];
 
-export const birthdayInputBlocks = (initialDate?: string): Blocks => [
+export const getBirthdayInputBlocks = (initialDate?: string): Blocks => [
   {
     type: "input",
     element: {
@@ -154,7 +135,7 @@ export const birthdayInputBlocks = (initialDate?: string): Blocks => [
   },
 ];
 
-export const generateBirthdayMessage = async (
+export const getBirthdayMessageBlocks = async (
   slackUser: string
 ): Promise<Blocks> => {
   const { messageText, imageURL } = await getRandomMessage();

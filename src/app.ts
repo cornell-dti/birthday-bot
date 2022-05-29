@@ -8,10 +8,11 @@ import {
   ViewSubmitAction,
 } from "@slack/bolt";
 import {
-  birthdayInputBlocks,
-  generateHomeBlocks,
-  welcomeInitBlocks,
-  welcomeResBlocks,
+  getBirthdayInputBlocks,
+  getHomeBlocks,
+  getWelcomeMessageBlocks,
+  getWelcomePromptBlocks,
+  getWelcomeResponseBlocks,
 } from "./blocks";
 import {
   BDAY_EDIT,
@@ -19,7 +20,11 @@ import {
   ModalMetadata,
   BDAY_MODAL_OPEN,
 } from "./blocks/actions";
-import { prisma } from "./util/db";
+import {
+  findBirthdayOfUser,
+  removeBirthdayEntry,
+  upsertBirthdayEntry,
+} from "./util/db";
 import { getScheduledPosts } from "./util";
 
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
@@ -31,11 +36,6 @@ const app = new App({
   port: Number(process.env.PORT) || 3000,
 });
 
-app.use(async ({ next }) => {
-  // TODO: This can be improved in future versions
-  await next!();
-});
-
 app.event("app_home_opened", async ({ event, client, logger }) => {
   const userInfo = await client.users.info({
     user: event.user,
@@ -43,19 +43,12 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
   if (userInfo.error) {
     logger.error(userInfo.error);
   }
-  const result = await prisma.birthday.findFirst({
-    select: {
-      birthday: true,
-    },
-    where: {
-      slackUser: event.user,
-    },
-  });
+  const result = await findBirthdayOfUser(event.user);
   await client.views.publish({
     user_id: event.user,
     view: {
       type: "home",
-      blocks: generateHomeBlocks(
+      blocks: getHomeBlocks(
         userInfo?.user?.profile?.display_name,
         result?.birthday
       ),
@@ -65,11 +58,16 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
 
 app.event("team_join", async ({ event, client, logger }) => {
   try {
-    const result = await client.chat.postMessage({
+    const message = await client.chat.postMessage({
       channel: event.user.id,
-      blocks: welcomeInitBlocks(event.user.id),
+      blocks: getWelcomeMessageBlocks(event.user.id),
     });
-    logger.info(result);
+    logger.info(message);
+    const prompt = await client.chat.postMessage({
+      channel: event.user.id,
+      blocks: getWelcomePromptBlocks(),
+    });
+    logger.info(prompt);
   } catch (error) {
     logger.error(error);
   }
@@ -103,7 +101,7 @@ app.action<BlockAction<ButtonAction>>(
             type: "plain_text",
             text: "Cancel",
           },
-          blocks: birthdayInputBlocks(action.value),
+          blocks: getBirthdayInputBlocks(action.value),
         },
       });
       logger.info(result);
@@ -147,7 +145,7 @@ app.view<ViewSubmitAction>(
         user_id: slackUser,
         view: {
           type: "home",
-          blocks: generateHomeBlocks(
+          blocks: getHomeBlocks(
             userInfo?.user?.profile?.display_name,
             birthday
           ),
@@ -174,18 +172,12 @@ app.view<ViewSubmitAction>(
           client.chat.update({
             ts: metadata.ts,
             channel: metadata.channel,
-            blocks: welcomeResBlocks(slackUser),
+            blocks: getWelcomeResponseBlocks(),
           });
         }
-        await prisma.birthday.upsert({
-          create: { slackUser, birthday },
-          update: { birthday },
-          where: { slackUser },
-        });
+        await upsertBirthdayEntry(slackUser, birthday);
       } else {
-        await prisma.birthday.deleteMany({
-          where: { slackUser },
-        });
+        await removeBirthdayEntry(slackUser);
       }
     } catch (error) {
       logger.error(error);

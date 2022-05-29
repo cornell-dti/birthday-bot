@@ -1,8 +1,8 @@
 import "./util/env";
 import moment from "moment";
-import { prisma } from "./util/db";
+import { findUsersWithBirthday } from "./util/db";
 import { WebClient } from "@slack/web-api";
-import { generateBirthdayMessage } from "./blocks";
+import { getBirthdayMessageBlocks } from "./blocks";
 import { getScheduledPosts } from "./util";
 
 // Right now we schedule in UTC, does not account for daylight savings
@@ -24,16 +24,7 @@ const schedulePosts = async () => {
       .unix();
     // Birthday representations in DB are stored with year 0
     const dbToday = moment().utc().year(0).toDate();
-    const users = await prisma.birthday.findMany({
-      select: {
-        slackUser: true,
-      },
-      where: {
-        birthday: {
-          equals: dbToday,
-        },
-      },
-    });
+    const users = await findUsersWithBirthday(dbToday);
     const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID);
     await Promise.all(
       users.map(async ({ slackUser }) => {
@@ -45,7 +36,7 @@ const schedulePosts = async () => {
           channel: TARGET_CHANNEL_ID,
           post_at: postAt,
           text: `Happy Birthday <@${slackUser}>!`,
-          ...generateBirthdayMessage(slackUser),
+          ...getBirthdayMessageBlocks(slackUser),
         });
       })
     );
