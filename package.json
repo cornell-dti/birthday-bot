@@ -2,6 +2,7 @@
   "name": "dti-birthday-bot",
   "version": "1.0.0",
   "description": "DTI Birthday Bot",
+  "packageManager": "pnpm@7.1.6",
   "main": "dist/app.js",
   "scripts": {
     "lint": "eslint --fix",
