@@ -27,28 +27,27 @@ Roadmap:
 
 ## Setup
 
+The project uses [pnpm](https://pnpm.io/) to manage packages.
+
 ### Install
 
 ```bash
 # Install dependencies
-yarn install
+pnpm install
 ```
 
 ### Development
 
 ```bash
 # Run locally
-yarn dev
+pnpm dev
 
 # Build and run for production
-yarn start
+pnpm build
+pnpm start
 
 # Lint/format/typecheck
-yarn lint:check
-yarn format:check
-yarn typecheck
+pnpm lint:check
+pnpm format:check
+pnpm typecheck
 ```
-
-## Contributors
-
-- @Enochen - Created in 2022
