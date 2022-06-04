@@ -10,10 +10,17 @@
     "format": "prettier --check ./src",
     "format:fix": "prettier --write ./src",
     "typecheck": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "migrate:reset": "prisma migrate reset",
+    "migrate:create": "prisma migrate dev --create-only",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:deploy": "prisma migrate deploy",
+    "prisma:generate": "prisma generate",
     "dev": "ts-node src/app.ts",
     "build": "swc ./src -d dist",
     "start": "node dist/app.js",
-    "schedule-posts": "node dist/job.js"
+    "schedule-posts": "node dist/job.js",
+    "render-build": "pnpm prisma:generate && pnpm migrate:deploy && pnpm build"
   },
   "license": "MIT",
   "dependencies": {
