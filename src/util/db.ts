@@ -2,32 +2,32 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export const upsertBirthdayEntry = (slackUser: string, birthday: Date) =>
+export const upsertBirthdayEntry = (user: string, birthday: Date) =>
   prisma.birthday.upsert({
-    create: { slackUser, birthday },
+    create: { user, birthday },
     update: { birthday },
-    where: { slackUser },
+    where: { user },
   });
 
-export const removeBirthdayEntry = (slackUser: string) =>
+export const removeBirthdayEntry = (user: string) =>
   prisma.birthday.deleteMany({
-    where: { slackUser },
+    where: { user },
   });
 
-export const findBirthdayOfUser = (slackUser: string) =>
+export const findBirthdayOfUser = (user: string) =>
   prisma.birthday.findFirst({
     select: {
       birthday: true,
     },
     where: {
-      slackUser,
+      user,
     },
   });
 
 export const findUsersWithBirthday = (day: Date) =>
   prisma.birthday.findMany({
     select: {
-      slackUser: true,
+      user: true,
     },
     where: {
       birthday: {

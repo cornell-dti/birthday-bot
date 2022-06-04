@@ -27,16 +27,16 @@ const schedulePosts = async () => {
     const users = await findUsersWithBirthday(dbToday);
     const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID);
     await Promise.all(
-      users.map(async ({ slackUser }) => {
+      users.map(async ({ user }) => {
         const alreadyScheduled = scheduled.scheduled_messages?.some((msg) =>
-          msg.text?.includes(`<@${slackUser}>`)
+          msg.text?.includes(`<@${user}>`)
         );
         if (alreadyScheduled) return;
         client.chat.scheduleMessage({
           channel: TARGET_CHANNEL_ID,
           post_at: postAt,
-          text: `Happy Birthday <@${slackUser}>!`,
-          ...getBirthdayMessageBlocks(slackUser),
+          text: `Happy Birthday <@${user}>!`,
+          ...getBirthdayMessageBlocks(user),
         });
       })
     );
