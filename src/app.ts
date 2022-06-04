@@ -20,11 +20,7 @@ import {
   ModalMetadata,
   BDAY_MODAL_OPEN,
 } from "./blocks/actions";
-import {
-  findBirthdayOfUser,
-  removeBirthdayEntry,
-  upsertBirthdayEntry,
-} from "./util/db";
+import { findBirthdayOfUser, removeBirthday, upsertBirthday } from "./util/db";
 import { getScheduledPosts } from "./util";
 
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
@@ -34,6 +30,16 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   logLevel: LogLevel.DEBUG,
   port: Number(process.env.PORT) || 3000,
+  customRoutes: [
+    {
+      path: "/health",
+      method: ["GET"],
+      handler: (_req, res) => {
+        res.writeHead(200);
+        res.end("ok");
+      },
+    },
+  ],
 });
 
 app.event("app_home_opened", async ({ event, client, logger }) => {
@@ -172,9 +178,9 @@ app.view<ViewSubmitAction>(
             blocks: getWelcomeResponseBlocks(),
           });
         }
-        await upsertBirthdayEntry(user, birthday);
+        await upsertBirthday(user, birthday);
       } else {
-        await removeBirthdayEntry(user);
+        await removeBirthday(user);
       }
     } catch (error) {
       logger.error(error);

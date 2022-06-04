@@ -2,11 +2,11 @@ import giphyAPI from "giphy-api";
 
 const giphy = giphyAPI(process.env.GIPHY_API_KEY);
 
-export const getRandomGIF = async (tag = "birthday") => {
+export const getRandomGIF = async (tag = "birthday celebration") => {
   const { data } = await giphy.random({
     tag,
     rating: "g",
     fmt: "json",
   });
-  return data.bitly_url;
+  return data.images.downsized.url;
 };
