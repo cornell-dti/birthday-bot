@@ -16,22 +16,12 @@ export const removeBirthdayEntry = (user: string) =>
 
 export const findBirthdayOfUser = (user: string) =>
   prisma.birthday.findFirst({
-    select: {
-      birthday: true,
-    },
-    where: {
-      user,
-    },
+    select: { birthday: true },
+    where: { user },
   });
 
 export const findUsersWithBirthday = (day: Date) =>
   prisma.birthday.findMany({
-    select: {
-      user: true,
-    },
-    where: {
-      birthday: {
-        equals: day,
-      },
-    },
+    select: { user: true },
+    where: { birthday: { equals: day } },
   });
