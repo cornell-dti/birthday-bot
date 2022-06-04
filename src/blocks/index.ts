@@ -64,12 +64,12 @@ export const getHomeBlocks = (
   ];
 };
 
-export const getWelcomeMessageBlocks = (slackUser: string): Blocks => [
+export const getWelcomeMessageBlocks = (user: string): Blocks => [
   {
     type: "section",
     text: {
       type: "mrkdwn",
-      text: `Hey <@${slackUser}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
+      text: `Hey <@${user}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
     },
   },
   {
@@ -136,7 +136,7 @@ export const getBirthdayInputBlocks = (initialDate?: string): Blocks => [
 ];
 
 export const getBirthdayMessageBlocks = async (
-  slackUser: string
+  user: string
 ): Promise<Blocks> => {
   const { messageText, imageURL } = await getRandomMessage();
   return [
@@ -144,7 +144,7 @@ export const getBirthdayMessageBlocks = async (
       type: "section",
       text: {
         type: "mrkdwn",
-        text: `Hey <@${slackUser}>,`,
+        text: `Hey <@${user}>,`,
       },
     },
     {

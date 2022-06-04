@@ -37,15 +37,14 @@ const app = new App({
 });
 
 app.event("app_home_opened", async ({ event, client, logger }) => {
-  const userInfo = await client.users.info({
-    user: event.user,
-  });
+  const { user } = event;
+  const userInfo = await client.users.info({ user });
   if (userInfo.error) {
     logger.error(userInfo.error);
   }
   const result = await findBirthdayOfUser(event.user);
   await client.views.publish({
-    user_id: event.user,
+    user_id: user,
     view: {
       type: "home",
       blocks: getHomeBlocks(
@@ -130,19 +129,17 @@ app.view<ViewSubmitAction>(
       )!;
       const value = view.state.values[block.block_id][BDAY_EDIT].selected_date;
 
-      const slackUser = body.user.id;
+      const user = body.user.id;
       const birthday = value ? new Date(value) : undefined;
       birthday?.setFullYear(0);
 
-      const userInfo = await client.users.info({
-        user: slackUser,
-      });
+      const userInfo = await client.users.info({ user });
       if (userInfo.error) {
         logger.error(userInfo.error);
       }
 
       const result = await client.views.publish({
-        user_id: slackUser,
+        user_id: user,
         view: {
           type: "home",
           blocks: getHomeBlocks(
@@ -155,7 +152,7 @@ app.view<ViewSubmitAction>(
 
       const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID);
       scheduled.scheduled_messages
-        ?.filter((msg) => msg.text?.includes(`<@${slackUser}>`))
+        ?.filter((msg) => msg.text?.includes(`<@${user}>`))
         ?.forEach((msg) => {
           if (!msg.channel_id || !msg.id) return;
           client.chat.deleteScheduledMessage({
@@ -175,9 +172,9 @@ app.view<ViewSubmitAction>(
             blocks: getWelcomeResponseBlocks(),
           });
         }
-        await upsertBirthdayEntry(slackUser, birthday);
+        await upsertBirthdayEntry(user, birthday);
       } else {
-        await removeBirthdayEntry(slackUser);
+        await removeBirthdayEntry(user);
       }
     } catch (error) {
       logger.error(error);
