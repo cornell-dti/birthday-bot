@@ -3,11 +3,11 @@ import { getRandomItem } from "./";
 import { getRandomGIF } from "./giphy";
 
 type MessageText = string;
-type MessageImageURL = string;
+type MessageImageUrl = string;
 
-interface BirthdayMessage {
+export interface MessageContents {
   messageText: MessageText;
-  imageURL: MessageImageURL;
+  imageUrl: MessageImageUrl;
 }
 
 const presetMessages: MessageText[] = [
@@ -17,10 +17,10 @@ const presetMessages: MessageText[] = [
   "Wishing you a great birthday and a memorable year. From all of us. :heart:",
 ];
 
-export const getRandomMessage = async (): Promise<BirthdayMessage> => {
+export const generateRandomContents = async (): Promise<MessageContents> => {
   return {
     messageText: getRandomItem(presetMessages),
-    imageURL: await getRandomGIF(),
+    imageUrl: await getRandomGIF(),
   };
 };
 
