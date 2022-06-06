@@ -49,8 +49,11 @@ pnpm dev
 pnpm build
 pnpm start
 
+# Run tests
+pnpm test
+
 # Lint/format/typecheck
-pnpm lint:check
-pnpm format:check
+pnpm lint
+pnpm format
 pnpm typecheck
 ```

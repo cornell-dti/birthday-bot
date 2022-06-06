@@ -1,4 +1,4 @@
-import moment from "moment";
+import moment, { Moment } from "moment";
 import { getRandomItem } from "./";
 import { getRandomGIF } from "./giphy";
 
@@ -27,7 +27,7 @@ export const generateRandomMessageContents =
 
 export const generateBirthdayStatus = (
   userName?: string,
-  birthday?: moment.Moment
+  birthday?: Moment
 ): string => {
   if (!birthday) return "You currently have no birthday registered.";
   const daysAway = birthday.diff(moment().utc().startOf("day"), "days");

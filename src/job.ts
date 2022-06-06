@@ -3,7 +3,7 @@ import moment from "moment";
 import { findUsersWithBirthday } from "./util/db";
 import { WebClient } from "@slack/web-api";
 import { getScheduledPosts } from "./util";
-import { generateRandomContents } from "./util/messages";
+import { generateRandomMessageContents } from "./util/messages";
 import { BirthdayCelebrationMessage } from "./blocks";
 
 // Right now we schedule in UTC, does not account for daylight savings
@@ -33,7 +33,7 @@ const schedulePosts = async () => {
           msg.text?.includes(`<@${user}>`)
         );
         if (alreadyScheduled) return;
-        const contents = await generateRandomContents();
+        const contents = await generateRandomMessageContents();
         client.chat.scheduleMessage({
           ...BirthdayCelebrationMessage(user, contents),
           channel: TARGET_CHANNEL_ID,
