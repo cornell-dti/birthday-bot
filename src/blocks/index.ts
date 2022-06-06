@@ -1,4 +1,3 @@
-import { Moment } from "moment";
 import {
   Actions,
   Button,
@@ -12,25 +11,28 @@ import {
   Modal,
   Section,
 } from "slack-block-builder";
+import { getNextInstanceOfDay } from "../util";
 import { MessageContents, generateBirthdayStatus } from "../util/messages";
 import { BDAY_EDIT, BDAY_MODAL, BDAY_MODAL_OPEN } from "./actions";
 
-export const HomeView = (displayName?: string, birthday?: Moment) =>
-  HomeTab()
+export const HomeView = (displayName?: string, birthday?: Date) => {
+  const nextBirthday = birthday && getNextInstanceOfDay(birthday);
+  return HomeTab()
     .blocks(
       Header({ text: ":bust_in_silhouette: Your Summary" }),
       Divider(),
       Section({ text: "Set your birthday so we can celebrate it together!" }),
-      Section({ text: generateBirthdayStatus(displayName, birthday) }),
+      Section({ text: generateBirthdayStatus(displayName, nextBirthday) }),
       Actions().elements(
         Button({
           actionId: BDAY_MODAL_OPEN,
           text: birthday ? "Edit Birthday" : `Set Birthday`,
-          value: birthday?.toISOString(),
+          value: nextBirthday?.toISOString(),
         }).primary(!birthday)
       )
     )
     .buildToObject();
+};
 
 export const WelcomeMessage = (user: string) =>
   Message({ channel: user })

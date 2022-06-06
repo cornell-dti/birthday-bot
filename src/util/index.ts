@@ -15,9 +15,8 @@ export const getScheduledPosts = async (client: WebClient, channel: string) => {
 /**
  * Gives the closest day in the future that matches input date (month/day)
  */
-export const getNextInstanceOfDay = (date?: Date | null) => {
-  if (!date) return undefined;
-  const next = moment().utc().month(date.getUTCMonth()).date(date.getUTCDate());
+export const getNextInstanceOfDay = (date: Date) => {
   const today = moment().utc().startOf("day");
+  const next = today.clone().month(date.getUTCMonth()).date(date.getUTCDate());
   return next.isBefore(today, "day") ? next.add(1, "year") : next;
 };

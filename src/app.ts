@@ -21,7 +21,7 @@ import {
   BDAY_MODAL_OPEN,
 } from "./blocks/actions";
 import { findBirthdayOfUser, upsertBirthday } from "./util/db";
-import { getNextInstanceOfDay, getScheduledPosts } from "./util";
+import { getScheduledPosts } from "./util";
 
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
 
@@ -50,13 +50,14 @@ app.event("app_home_opened", async ({ event, client, logger }) => {
       logger.error(userInfo.error);
       // TODO: Publish error in home view
     }
-    const { birthday } = (await findBirthdayOfUser(event.user)) || {};
+    const displayName = userInfo.user?.profile?.display_name;
+
+    const dbLookup = await findBirthdayOfUser(event.user);
+    const birthday = dbLookup?.birthday || undefined;
+
     const publishResponse = await client.views.publish({
       user_id: user,
-      view: HomeView(
-        userInfo.user?.profile?.display_name,
-        getNextInstanceOfDay(birthday)
-      ),
+      view: HomeView(displayName, birthday),
     });
     logger.info(publishResponse);
   } catch (error) {
@@ -117,17 +118,18 @@ app.view<ViewSubmitAction>(
       const value = view.state.values[block.block_id][BDAY_EDIT].selected_date;
 
       const user = body.user.id;
-      const birthday = value ? new Date(value) : undefined;
-
       const userInfo = await client.users.info({ user });
-      logger.info(userInfo);
+      if (userInfo.error) {
+        logger.error(userInfo.error);
+        // TODO: Publish error in home view
+      }
+
+      const displayName = userInfo.user?.profile?.display_name;
+      const birthday = value ? new Date(value) : undefined;
 
       const publishResponse = await client.views.publish({
         user_id: user,
-        view: HomeView(
-          userInfo.user?.profile?.display_name,
-          getNextInstanceOfDay(birthday)
-        ),
+        view: HomeView(displayName, birthday),
       });
       logger.info(publishResponse);
 
