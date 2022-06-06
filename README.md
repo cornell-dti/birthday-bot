@@ -39,6 +39,9 @@ pnpm install
 ### Development
 
 ```bash
+# Generate Prisma client
+pnpm prisma:generate
+
 # Run locally
 pnpm dev
 

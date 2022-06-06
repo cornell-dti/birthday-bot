@@ -2,8 +2,9 @@ import "./util/env";
 import moment from "moment";
 import { findUsersWithBirthday } from "./util/db";
 import { WebClient } from "@slack/web-api";
-import { getBirthdayMessageBlocks } from "./blocks";
 import { getScheduledPosts } from "./util";
+import { generateRandomContents } from "./util/messages";
+import { BirthdayCelebrationMessage } from "./blocks";
 
 // Right now we schedule in UTC, does not account for daylight savings
 const CELEBRATION_HOUR = 14; // 14 = 2pm UTC = 10am EDT = 9am EST
@@ -22,7 +23,7 @@ const schedulePosts = async () => {
         second: 0,
       })
       .unix();
-    // Birthday representations in DB are stored with year 0
+    // Birthdays are normalized with year 0 in db
     const dbToday = moment().utc().year(0).toDate();
     const users = await findUsersWithBirthday(dbToday);
     const scheduled = await getScheduledPosts(client, TARGET_CHANNEL_ID);
@@ -32,11 +33,11 @@ const schedulePosts = async () => {
           msg.text?.includes(`<@${user}>`)
         );
         if (alreadyScheduled) return;
+        const contents = await generateRandomContents();
         client.chat.scheduleMessage({
+          ...BirthdayCelebrationMessage(user, contents),
           channel: TARGET_CHANNEL_ID,
           post_at: postAt,
-          text: `Happy Birthday <@${user}>!`,
-          ...getBirthdayMessageBlocks(user),
         });
       })
     );

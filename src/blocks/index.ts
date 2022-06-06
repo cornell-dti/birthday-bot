@@ -1,163 +1,98 @@
-import { Block, KnownBlock } from "@slack/bolt";
-import moment from "moment";
-import { generateBirthdayStatus, getRandomMessage } from "../util/messages";
-import { BDAY_EDIT, BDAY_MODAL_OPEN } from "./actions";
+import { Moment } from "moment";
+import {
+  Actions,
+  Button,
+  DatePicker,
+  Divider,
+  Header,
+  HomeTab,
+  Image,
+  Input,
+  Message,
+  Modal,
+  Section,
+} from "slack-block-builder";
+import { MessageContents, generateBirthdayStatus } from "../util/messages";
+import { BDAY_EDIT, BDAY_MODAL, BDAY_MODAL_OPEN } from "./actions";
 
-type Blocks = (KnownBlock | Block)[];
+export const HomeView = (displayName?: string, birthday?: Moment) =>
+  HomeTab()
+    .blocks(
+      Header({ text: ":bust_in_silhouette: Your Summary" }),
+      Divider(),
+      Section({ text: "Set your birthday so we can celebrate it together!" }),
+      Section({ text: generateBirthdayStatus(displayName, birthday) }),
+      Actions().elements(
+        Button({
+          actionId: BDAY_MODAL_OPEN,
+          text: birthday ? "Edit Birthday" : `Set Birthday`,
+          value: birthday?.toISOString(),
+        }).primary(!birthday)
+      )
+    )
+    .buildToObject();
 
-export const getHomeBlocks = (
-  userName?: string,
-  birthdayRaw?: Date
-): Blocks => {
-  const birthday =
-    birthdayRaw &&
-    moment()
-      .utc()
-      .month(birthdayRaw.getUTCMonth())
-      .date(birthdayRaw.getUTCDate());
-  if (birthday?.isBefore(moment().utc().startOf("day"), "day")) {
-    birthday?.add(1, "year");
-  }
-  return [
-    {
-      type: "header",
-      text: {
-        type: "plain_text",
-        text: ":bust_in_silhouette: Your Summary",
-        emoji: true,
-      },
-    },
-    {
-      type: "divider",
-    },
-    {
-      type: "section",
-      text: {
-        type: "plain_text",
-        text: "Set your birthday so we can celebrate it together!",
-        emoji: true,
-      },
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: generateBirthdayStatus(userName, birthday),
-      },
-    },
-    {
-      type: "actions",
-      elements: [
-        {
-          type: "button",
-          style: birthday ? undefined : "primary",
-          text: {
-            type: "plain_text",
-            text: birthday ? "Edit Birthday" : `Set Birthday`,
-            emoji: true,
-          },
-          value: birthday?.format("YYYY-MM-DD"),
-          action_id: BDAY_MODAL_OPEN,
-        },
-      ],
-    },
-  ];
-};
+export const WelcomeMessage = (user: string) =>
+  Message({ channel: user })
+    .blocks(
+      Section({
+        text: `Hey <@${user}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
+      })
+    )
+    .buildToObject();
 
-export const getWelcomeMessageBlocks = (user: string): Blocks => [
-  {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `Hey <@${user}>, I'm the DTI Birthday Bot, the coolest bot in DTI!`,
-    },
-  },
-  {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: "When the special day arrives, I share a fun birthday wish for each member of the team. :tada:",
-    },
-  },
-];
+export const WelcomePrompt = (user: string) =>
+  Message({ channel: user })
+    .blocks(
+      Actions().elements(
+        Button({ text: ":cake: Add Birthday", actionId: BDAY_MODAL_OPEN })
+      )
+    )
+    .buildToObject();
 
-export const getWelcomePromptBlocks = (): Blocks => [
-  {
-    type: "actions",
-    elements: [
-      {
-        type: "button",
-        text: {
-          type: "plain_text",
-          text: ":cake: Add Birthday",
-          emoji: true,
-        },
-        action_id: BDAY_MODAL_OPEN,
-      },
-    ],
-  },
-];
+export const WelcomePromptResponse = (user: string) =>
+  Message({ channel: user })
+    .blocks(
+      Section({
+        text: `Thanks adding your birthday! You can head to my Home tab for more details.`,
+      })
+    )
+    .buildToObject();
 
-export const getWelcomeResponseBlocks = (): Blocks => [
-  {
-    type: "section",
-    text: {
-      type: "mrkdwn",
-      text: `Thanks adding your birthday! You can head to my Home tab for more details.`,
-    },
-  },
-];
+export const BirthdayInput = (initialDate?: Date, privateMetaData?: string) =>
+  Modal({
+    title: "Add Your Birthday!",
+    submit: "Save",
+    close: "Cancel",
+    callbackId: BDAY_MODAL,
+    privateMetaData,
+  })
+    .blocks(
+      Input({
+        label: "Birthday",
+        hint: "(i will ignore the year)",
+      })
+        .element(
+          DatePicker({
+            actionId: BDAY_EDIT,
+            initialDate,
+            placeholder: "Select a date",
+          })
+        )
+        .optional(!!initialDate)
+    )
+    .buildToObject();
 
-export const getBirthdayInputBlocks = (initialDate?: string): Blocks => [
-  {
-    type: "input",
-    element: {
-      type: "datepicker",
-      initial_date: initialDate,
-      placeholder: {
-        type: "plain_text",
-        text: "Select a date",
-        emoji: true,
-      },
-      action_id: BDAY_EDIT,
-    },
-    optional: true,
-    label: {
-      type: "plain_text",
-      text: "Birthday",
-      emoji: true,
-    },
-    hint: {
-      type: "plain_text",
-      text: "(i will ignore the year)",
-      emoji: true,
-    },
-  },
-];
-
-export const getBirthdayMessageBlocks = async (
-  user: string
-): Promise<Blocks> => {
-  const { messageText, imageURL } = await getRandomMessage();
-  return [
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `Hey <@${user}>,`,
-      },
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: messageText,
-      },
-    },
-    {
-      type: "image",
-      image_url: imageURL,
-      alt_text: "birthday celebration",
-    },
-  ];
+export const BirthdayCelebrationMessage = (
+  user: string,
+  contents: MessageContents
+) => {
+  const { messageText, imageUrl } = contents;
+  return Message({ text: `Happy Birthday <@${user}>!` })
+    .blocks(
+      Section({ text: `Hey <@${user}>,` }),
+      Section({ text: messageText }),
+      Image({ altText: "birthday celebration gif", imageUrl })
+    )
+    .buildToObject();
 };
