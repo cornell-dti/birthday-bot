@@ -4,21 +4,11 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
-      - run: pnpm lint
-  format:
+  format-lint-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
       - run: pnpm format
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup
+      - run: pnpm lint
       - run: pnpm test
