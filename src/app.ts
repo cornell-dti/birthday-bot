@@ -20,7 +20,7 @@ import {
   ModalMetadata,
   BDAY_MODAL_OPEN,
 } from "./blocks/actions";
-import { findBirthdayOfUser, removeBirthday, upsertBirthday } from "./util/db";
+import { findBirthdayOfUser, upsertBirthday } from "./util/db";
 import { getNextInstanceOfDay, getScheduledPosts } from "./util";
 
 const TARGET_CHANNEL_ID = process.env.TARGET_CHANNEL_ID!;
@@ -85,9 +85,10 @@ app.action<BlockAction<ButtonAction>>(
         channel: body.channel?.id,
         response_url: body.response_url,
       };
+      const initialDate = action.value ? new Date(action.value) : undefined;
       const result = await client.views.open({
         trigger_id: body.trigger_id,
-        view: BirthdayInput(new Date(action.value), JSON.stringify(metadata)),
+        view: BirthdayInput(initialDate, JSON.stringify(metadata)),
       });
       logger.info(result);
     } catch (error) {
@@ -141,21 +142,17 @@ app.view<ViewSubmitAction>(
           });
         });
 
-      if (birthday) {
-        const metadata: ModalMetadata | undefined = JSON.parse(
-          body.view.private_metadata
-        );
-        if (metadata?.ts && metadata?.channel) {
-          client.chat.update({
-            ...WelcomePromptResponse(metadata.channel),
-            ts: metadata.ts,
-          });
-        }
-        birthday.setFullYear(0);
-        await upsertBirthday(user, birthday);
-      } else {
-        await removeBirthday(user);
+      const metadata: ModalMetadata | undefined = JSON.parse(
+        body.view.private_metadata
+      );
+      if (metadata?.ts && metadata?.channel) {
+        client.chat.update({
+          ...WelcomePromptResponse(metadata.channel),
+          ts: metadata.ts,
+        });
       }
+      birthday?.setFullYear(0);
+      await upsertBirthday(user, birthday);
     } catch (error) {
       logger.error(error);
     }

@@ -17,12 +17,13 @@ const presetMessages: MessageText[] = [
   "Wishing you a great birthday and a memorable year. From all of us. :heart:",
 ];
 
-export const generateRandomContents = async (): Promise<MessageContents> => {
-  return {
-    messageText: getRandomItem(presetMessages),
-    imageUrl: await getRandomGIF(),
+export const generateRandomMessageContents =
+  async (): Promise<MessageContents> => {
+    return {
+      messageText: getRandomItem(presetMessages),
+      imageUrl: await getRandomGIF(),
+    };
   };
-};
 
 export const generateBirthdayStatus = (
   userName?: string,

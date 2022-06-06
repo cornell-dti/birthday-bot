@@ -1,5 +1,4 @@
-import { Block, KnownBlock } from "@slack/bolt";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import {
   Actions,
   Button,
@@ -19,9 +18,7 @@ import { BDAY_EDIT, BDAY_MODAL, BDAY_MODAL_OPEN } from "./actions";
 export const HomeView = (displayName?: string, birthday?: Moment) =>
   HomeTab()
     .blocks(
-      Header({
-        text: ":bust_in_silhouette: Your Summary",
-      }),
+      Header({ text: ":bust_in_silhouette: Your Summary" }),
       Divider(),
       Section({ text: "Set your birthday so we can celebrate it together!" }),
       Section({ text: generateBirthdayStatus(displayName, birthday) }),
@@ -74,13 +71,15 @@ export const BirthdayInput = (initialDate?: Date, privateMetaData?: string) =>
       Input({
         label: "Birthday",
         hint: "(i will ignore the year)",
-      }).element(
-        DatePicker({
-          actionId: BDAY_EDIT,
-          initialDate,
-          placeholder: "Select a date",
-        })
-      )
+      })
+        .element(
+          DatePicker({
+            actionId: BDAY_EDIT,
+            initialDate,
+            placeholder: "Select a date",
+          })
+        )
+        .optional(!!initialDate)
     )
     .buildToObject();
 
